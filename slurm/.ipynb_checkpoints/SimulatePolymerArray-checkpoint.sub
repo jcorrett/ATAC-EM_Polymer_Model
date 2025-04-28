@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --job-name=polymer_sim      ## job name
+#SBATCH -A ACCOUNT_NAME     ## account to charge
+#SBATCH -p PARTITION          ## partition/queue name
+#SBATCH --ntasks=1           ## (-n) number of tasks to launch
+#SBATCH --cpus-per-task=1    ## number of cores the job needs
+#SBATCH --mem-per-cpu=4G
+#SBATCH --array=1-1000
+#SBATCH -o ./Logs/%A_%a.log # STDOUT
+
+source ~/.bashrc
+
+conda activate wlcstat
+
+##CXCL9
+
+srun python SimulateTSSContact.py --mode ATAC --output_dir "../data" --exp_name "unstim" --gene_name "CXCL9" --link_model "sample" --contact_distance 10.0 --num_sims 100 --job_id $SLURM_ARRAY_JOB_ID --task_id $SLURM_ARRAY_TASK_ID --packed_link 43 --packed_sig 0 --packed_lambda 43 --packed_k 1.000
+
+srun python SimulateTSSContact.py --mode ATAC --output_dir "../data" --exp_name "lps_1h" --gene_name "CXCL9" --link_model "sample" --contact_distance 10.0 --num_sims 100 --job_id $SLURM_ARRAY_JOB_ID --task_id $SLURM_ARRAY_TASK_ID --packed_link 43 --packed_sig 0 --packed_lambda 43 --packed_k 1.000
+
+
+conda deactivate

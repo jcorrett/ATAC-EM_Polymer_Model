@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --job-name=polymer_sim      ## job name
+#SBATCH -A ACCOUNT_NAME     ## account to charge
+#SBATCH -p PARTITION          ## partition/queue name
+#SBATCH --ntasks=1           ## (-n) number of tasks to launch
+#SBATCH --cpus-per-task=1    ## number of cores the job needs
+#SBATCH --array=1-1000
+#SBATCH -o ./logs/%A_%a.log # STDOUT       ##output files for debugging
+
+source ~/.bashrc
+
+conda activate wlcstat
+
+##Null Sweep
+
+srun python SimulateNullSweep.py --mode ATAC --output_dir "../data" --exp_name "NULL" --gene_name "MODEL10K" --link_model "sample" --contact_distance 10.0 --num_sims 10 --job_id $SLURM_ARRAY_JOB_ID --task_id $SLURM_ARRAY_TASK_ID
+
+conda deactivate
