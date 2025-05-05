@@ -53,7 +53,7 @@ from sklearn.isotonic import IsotonicRegression
 
 def load_conf_data(gene_name,exp_name,datadir,files,N_files):
     
-    with open(datadir+gene_name+'/'+exp_name+'/'+'variables.pkl', 'rb') as file:
+    with open(os.path.join(datadir,gene_name,exp_name,'variables.pkl'), 'rb') as file:
         temp = pickle.load(file)
         location = temp[0]
         signal = temp[1]
@@ -75,34 +75,21 @@ def load_conf_data(gene_name,exp_name,datadir,files,N_files):
     for i in range(N_files):
         strtemp = files[i]
         if strtemp[0] != 'v':
-            with open(datadir+gene_name+'/'+exp_name+'/'+strtemp, 'rb') as file:
-                    # tss_contact_temp, rogtemp = pickle.load(file)
-                    # tss_contact_temp = sparse.csc_matrix.todense(tss_contact_temp)
-                    # tss_contact_temp = np.array(tss_contact_temp)
-                    # tss_contact_temp = tss_contact_temp[0]
+            with open(os.path.join(datadir,gene_name,exp_name,strtemp), 'rb') as file:
 
                     tss_contact_temp = pickle.load(file)
                     tss_contact_temp = np.array(sparse.csc_matrix.todense(tss_contact_temp[0]))[0]
             if flag:
                 N = 0
-                # rog_0h = np.zeros(len(files)-1)
                 tss_contact = np.zeros(len(tss_contact_temp))
                 flag = False
-            #r[idx,:,0] = rtemp[:,0]
-            #r[idx,:,1] = rtemp[:,1]
-            #r[idx,:,2] = rtemp[:,2]
-            # rog_0h[idx] = rogtemp
             tss_contact = tss_contact+tss_contact_temp
             N += 1
-            # sys.stdout.flush()
             idx += 1
-    # print(str(N_files)+": Completed "+exp_name+"                                ", end='\r')
 
     x = location[:-1]
 
     xplot = x/1e3-x[tss_idx]/1e3
-
-    # N_0h = np.size(tss_contact_0h,axis=0)
 
     data_mean = np.copy(tss_contact/N)
     
@@ -111,7 +98,7 @@ def load_conf_data(gene_name,exp_name,datadir,files,N_files):
 
 def load_contact_mat_data(gene_name,exp_name,datadir,files,N_files):
     
-    with open(datadir+gene_name+'/'+exp_name+'/'+'variables.pkl', 'rb') as file:
+    with open(os.path.join(datadir,gene_name,exp_name,'variables.pkl'), 'rb') as file:
         temp = pickle.load(file)
         location = temp[0]
         signal = temp[1]
@@ -133,15 +120,8 @@ def load_contact_mat_data(gene_name,exp_name,datadir,files,N_files):
     for i in range(N_files):
         strtemp = files[i]
         if strtemp[0] != 'v':
-            with open(datadir+gene_name+'/'+exp_name+'/'+strtemp, 'rb') as file:
-                    # tss_contact_temp, rogtemp = pickle.load(file)
-                    # tss_contact_temp = sparse.csc_matrix.todense(tss_contact_temp)
-                    # tss_contact_temp = np.array(tss_contact_temp)
-                    # tss_contact_temp = tss_contact_temp[0]
-                    
+            with open(os.path.join(datadir,gene_name,exp_name,strtemp), 'rb') as file:
                     temp = pickle.load(file)
-                    # print(temp)
-
                     tss_contact_temp_poisson = temp[0]
                     tss_contact_temp_poisson = np.array(sparse.csc_matrix.todense(tss_contact_temp_poisson[0]))[0]
                     
@@ -224,7 +204,6 @@ def remove_background(x,y,tss_idx,i_left,i_right,window,filter_width):
 
     y_filtered[(tss_idx-int(2*window)):(tss_idx+int(2*window))] = np.mean(np.concatenate((y_filtered[0:(tss_idx-int(1.5*window))],y_filtered[(tss_idx+int(1.5*window)):])))
 
-    # y_filtered = (y_filtered-np.min(y_filtered[i_left:i_right]))/(np.max(y_filtered[i_left:i_right])-np.min(y_filtered[i_left:i_right]))
     
     dftemp = pd.Series(y_filtered)
     r = dftemp.rolling(window=filter_width)
